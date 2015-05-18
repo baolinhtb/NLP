@@ -4,7 +4,7 @@
 #include "File.h"
 #include "LM.h"
 #include "GenText.h"
-
+#include <unistd.h>
 
 #include <cstdio>
 #include <cstring>
@@ -349,6 +349,7 @@ void ranSentences(Ngram* ngram, unsigned numSentences, const char* filename){
     VocabString* sent;
     File file(filename,"w");
     unsigned i;
+    srand48(time(NULL) + getpid());
     for(i=0;i<numSentences;i++){
         sent = ngram->generateSentence(50000,(VocabString *) 0);
         swig_srilm_vocab->write(file, sent);
@@ -363,7 +364,7 @@ int main()
 {
     Ngram* n;
     n= initLM(3);
-    readLM(n,"copusnp.lm");
+    readLM(n,"model");
     ranSentences(n,1,"sentences.txt");
     deleteLM(n);
     cout<<"Successful";
