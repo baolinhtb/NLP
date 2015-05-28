@@ -5,18 +5,25 @@
 #include "LM.h"
 #include "GenText.h"
 #include <unistd.h>
-
+#include "TLSWrapper.h"
 #include <cstdio>
 #include <cstring>
 #include <cmath>
     
 #include <iostream>
 #include <fstream>
+
+
+#include "RemoteLM.h"
+#include "NgramStats.h"
+#include "NBest.h"
+#include "Array.cc"
+
 //#include <iostream>
 
 Vocab *swig_srilm_vocab;
 const float BIGNEG = -99;
-
+VocabIter *srilm_vocab_iter;
 
 // Initialize the ngram model
 Ngram* initLM(int order) {
@@ -353,21 +360,32 @@ void ranSentences(Ngram* ngram, unsigned numSentences, const char* filename){
     for(i=0;i<numSentences;i++){
         sent = ngram->generateSentence(50000,(VocabString *) 0);
         swig_srilm_vocab->write(file, sent);
-        //fprintf(file,"\n");
+        fprintf(file,"\n");
     }
     file.close();
 }
 
+const char* gensbWord(Ngram* ngram,const char* inputword){
+    unsigned index;
+    index = getIndexForWord(inputword);
+    return srilm_vocab_iter->next(index);
+}
+
+
 
 // Initialize the ngram model
-int main()
+int main(int argc, char *argv[])
 {
     Ngram* n;
+   // char* varo;
     n= initLM(3);
     readLM(n,"model");
-    ranSentences(n,1,"sentences.txt");
+    ranSentences(n,2,"sentences.txt");
+    //cin>>varo;
+    cout<<getIndexForWord("bathroom");
+    cout<<"\n";
+   // cout<<gensbWord(n,"bathroom");
     deleteLM(n);
     cout<<"Successful";
     cout<<"\n";
-    return 0;
 }
